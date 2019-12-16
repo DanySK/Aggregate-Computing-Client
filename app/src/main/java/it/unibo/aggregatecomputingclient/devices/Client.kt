@@ -35,7 +35,9 @@ class Client(private val context: Context, private val adapterBuilder: (VirtualD
     )
 
     override val communication = SocketCommunication(this)
-    override var receivedMessages: MutableSet<Message> = virtualDevice.receivedMessages
+    override var receivedMessages: MutableSet<Message>
+        get() = virtualDevice.receivedMessages
+        set(value) { virtualDevice.receivedMessages = value }
 
     override fun execute() = virtualDevice.execute()
     override fun tell(message: Message) = virtualDevice.tell(message)
