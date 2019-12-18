@@ -7,23 +7,15 @@ import it.unibo.aggregatecomputingclient.devices.Server
 import kotlin.concurrent.thread
 
 class SocketClientCommunication(private val client: Client,
-                                private val idHandler: (Int) -> Unit,
-                                private val executeHandler: () -> Unit) : ClientCommunication {
+                                private val handler: (Message) -> Unit) : ClientCommunication {
 
     override fun subscribeToServer(server: Server) {
         thread {
             server.tell(Message(client.id, MessageType.Join, Execution.listenPort))
+            println("sent join message to ${server.address}")
         }
     }
 
-    override fun listen() = client.communication.startServer { client.communication.extractMessage(it).handle() }
-    override fun stop() = client.communication.stopServer()
-
-    private fun Message.handle() {
-        when(this.type) {
-            MessageType.ID -> idHandler(this.content as Int)
-            MessageType.Execute -> executeHandler()
-            else -> {}
-        }
-    }
+    override fun listen() = client.physicalDevice.startServer { handler(client.physicalDevice.extractMessage(it)) }
+    override fun stop() = client.physicalDevice.stopServer()
 }

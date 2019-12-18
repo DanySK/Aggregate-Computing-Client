@@ -18,6 +18,7 @@ class Client(private val context: Context, private val adapterBuilder: (VirtualD
     private lateinit var virtualDevice: VirtualDevice
 
     fun assignId(value: Int) {
+        println("id set to $value")
         virtualDevice = VirtualDevice(value, adapterBuilder)
         id = value
     }
@@ -30,14 +31,12 @@ class Client(private val context: Context, private val adapterBuilder: (VirtualD
             ))
     }
 
-    override val address: SocketAddress = InetSocketAddress(getLocalIpAddress(),
-        Execution.listenPort
-    )
+    override val address: SocketAddress = InetSocketAddress(getLocalIpAddress(), Execution.listenPort)
 
-    override val communication = SocketCommunication(this)
-    override var receivedMessages: MutableSet<Message>
-        get() = virtualDevice.receivedMessages
-        set(value) { virtualDevice.receivedMessages = value }
+    override val physicalDevice = SocketCommunication(this)
+    override var status: MutableSet<Message>
+        get() = virtualDevice.status
+        set(value) { virtualDevice.status = value }
 
     override fun execute() = virtualDevice.execute()
     override fun tell(message: Message) = virtualDevice.tell(message)

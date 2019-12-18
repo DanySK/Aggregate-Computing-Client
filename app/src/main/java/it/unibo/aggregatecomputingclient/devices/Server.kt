@@ -8,14 +8,14 @@ import java.net.InetSocketAddress
 
 class Server(address: InetAddress, port: Int) : InternetDevice {
     override val address = InetSocketAddress(address, port)
-    override val communication = SocketCommunication(this)
+    override val physicalDevice = SocketCommunication(this)
 
     override val id: Int = -1
-    override var receivedMessages: MutableSet<Message> = mutableSetOf()
+    override var status: MutableSet<Message> = mutableSetOf()
 
     override fun execute() {
 
     }
 
-    override fun tell(message: Message) = communication.send(message)
+    override fun tell(message: Message) = physicalDevice.send(message)
 }
