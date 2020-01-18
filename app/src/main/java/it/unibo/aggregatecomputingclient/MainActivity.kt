@@ -12,6 +12,7 @@ import it.unibo.aggregatecomputingclient.adapters.protelis.HelloContext
 import it.unibo.aggregatecomputingclient.devices.Client
 import it.unibo.aggregatecomputingclient.devices.Server
 import kotlinx.android.synthetic.main.activity_main.*
+import org.protelis.lang.ProtelisLoader
 import java.net.InetAddress
 
 class MainActivity : AppCompatActivity() {
@@ -31,13 +32,17 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun connect(view: View) {
+
+        val program = ProtelisLoader.parse("module hello\n\n1")
+
+
         server = Server(
             InetAddress.getByName(serverAddress.text.toString()),
             serverPort.text.toString().toInt()
         )
 
         client = Client(applicationContext) {
-            ProtelisAdapter(it, resources.getResourceName(R.raw.hello), ::HelloContext) { c ->
+            ProtelisAdapter(it, "module hello\n\n1", ::HelloContext) { c ->
                 ClientNetworkManager(
                     c as Client,
                     server!!
