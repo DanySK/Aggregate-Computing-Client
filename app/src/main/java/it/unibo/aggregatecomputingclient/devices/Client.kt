@@ -3,6 +3,7 @@ package it.unibo.aggregatecomputingclient.devices
 import adapters.Adapter
 import android.content.Context
 import android.net.wifi.WifiManager
+import android.widget.Toast
 import communication.Message
 import communication.SocketCommunication
 import devices.InternetDevice
@@ -12,14 +13,14 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 
-class Client(private val context: Context, private val adapterBuilder: (VirtualDevice) -> Adapter) : InternetDevice {
+class Client(private val context: Context) : InternetDevice {
     override var id: Int = -1
 
     private lateinit var virtualDevice: VirtualDevice
 
     fun assignId(value: Int) {
         println("id set to $value")
-        virtualDevice = VirtualDevice(value, adapterBuilder)
+        virtualDevice = VirtualDevice(value)
         id = value
     }
 
@@ -40,4 +41,8 @@ class Client(private val context: Context, private val adapterBuilder: (VirtualD
 
     override fun execute() = virtualDevice.execute()
     override fun tell(message: Message) = virtualDevice.tell(message)
+
+    override fun showResult(result: String) {
+        Toast.makeText(context, result, Toast.LENGTH_SHORT ).show()
+    }
 }
