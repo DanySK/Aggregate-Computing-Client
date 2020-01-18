@@ -31,7 +31,9 @@ class MainActivity : AppCompatActivity() {
             serverPort.text.toString().toInt()
         )
 
-        client = Client(applicationContext) /*{
+        client = Client(applicationContext) {
+            resultText.text = "$it\n" + resultText.text.toString()
+        } /*{
             ProtelisAdapter(it, "module hello\n\n1", ::HelloContext) { c ->
                 ClientNetworkManager(
                     c as Client,

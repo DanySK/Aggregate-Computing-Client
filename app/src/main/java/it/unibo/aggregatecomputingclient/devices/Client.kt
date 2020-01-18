@@ -13,7 +13,7 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 
-class Client(private val context: Context) : InternetDevice {
+class Client(private val context: Context, private val onResult: (String) -> Unit) : InternetDevice {
     override var id: Int = -1
 
     private lateinit var virtualDevice: VirtualDevice
@@ -43,6 +43,6 @@ class Client(private val context: Context) : InternetDevice {
     override fun tell(message: Message) = virtualDevice.tell(message)
 
     override fun showResult(result: String) {
-        Toast.makeText(context, result, Toast.LENGTH_SHORT ).show()
+        onResult(result)
     }
 }
