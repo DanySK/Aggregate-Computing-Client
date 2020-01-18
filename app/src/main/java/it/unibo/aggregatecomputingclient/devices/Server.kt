@@ -1,6 +1,7 @@
 package it.unibo.aggregatecomputingclient.devices
 
 import communication.Message
+import communication.MessageType
 import communication.SocketCommunication
 import devices.InternetDevice
 import java.net.InetAddress
@@ -18,4 +19,6 @@ class Server(address: InetAddress, port: Int) : InternetDevice {
     }
 
     override fun tell(message: Message) = physicalDevice.send(message)
+    override fun showResult(result: String) = tell(Message(id, MessageType.Result, result))
+
 }
