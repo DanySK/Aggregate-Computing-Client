@@ -1,39 +1,69 @@
 package it.unibo.aggregatecomputingclient
 
+import adapters.protelis.ProtelisAdapter
+import adapters.protelis.ProtelisNetworkManager
+import adapters.protelis.SimpleProtelisContext
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import communication.Communication
-import communication.SocketCommunication
+import communication.MessageType
+import it.unibo.aggregatecomputingclient.adapters.protelis.ClientNetworkManager
+import it.unibo.aggregatecomputingclient.adapters.protelis.HelloContext
+import it.unibo.aggregatecomputingclient.devices.Client
+import it.unibo.aggregatecomputingclient.devices.Server
 import kotlinx.android.synthetic.main.activity_main.*
+import org.protelis.lang.ProtelisLoader
 import java.net.InetAddress
-import java.net.InetSocketAddress
 
 class MainActivity : AppCompatActivity() {
-    private val port = 20000
-    private lateinit var communication: Communication
-    private var id: Int = -1
+    private lateinit var client: Client
+    private var server: Server? = null
+    private var listener: ClientCommunication? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        communication = SocketCommunication(applicationContext, port)
-            { id = it; println("id set to $id") }
-
-        communication.listen()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        communication.close()
+        listener?.stop()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun connect(view: View) {
-        val address = InetSocketAddress(
+
+        val program = ProtelisLoader.parse("module hello\n\n1")
+
+
+        server = Server(
             InetAddress.getByName(serverAddress.text.toString()),
             serverPort.text.toString().toInt()
         )
-        communication.subscribeToServer(address)
+
+        client = Client(applicationContext) {
+            ProtelisAdapter(it, "module hello\n\n1", ::HelloContext) { c ->
+                ClientNetworkManager(
+                    c as Client,
+                    server!!
+                )
+            }
+        }
+
+        if (listener == null) {
+            listener = SocketClientCommunication(client) {
+                when (it.type) {
+                    MessageType.ID -> client.assignId(it.content as Int)
+                    MessageType.Execute -> client.execute()
+                    MessageType.Status -> client.status.add(it)
+                    else -> {
+                    }
+                }
+            }
+
+            listener!!.listen()
+
+            listener!!.subscribeToServer(server!!)
+        }
     }
 }
