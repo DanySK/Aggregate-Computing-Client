@@ -1,9 +1,9 @@
 package it.unibo.aggregatecomputingclient.devices
 
-import adapters.Adapter
+import adapters.scafi.AbstractAggregateProgram
+import adapters.scafi.ScafiAdapter
 import android.content.Context
 import android.net.wifi.WifiManager
-import android.widget.Toast
 import communication.Message
 import communication.SocketCommunication
 import devices.InternetDevice
@@ -13,14 +13,17 @@ import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 
-class Client(private val context: Context, private val onResult: (String) -> Unit) : InternetDevice {
+class Client(val context: Context, private val onResult: (String) -> Unit) : InternetDevice {
     override var id: Int = -1
+    override val name: String = "Client"
 
     private lateinit var virtualDevice: VirtualDevice
 
     fun assignId(value: Int) {
         println("id set to $value")
-        virtualDevice = VirtualDevice(value)
+        virtualDevice = VirtualDevice(value) { ScafiAdapter(it, object : AbstractAggregateProgram() {
+            override fun main(): Any = mid()
+        }) }
         id = value
     }
 

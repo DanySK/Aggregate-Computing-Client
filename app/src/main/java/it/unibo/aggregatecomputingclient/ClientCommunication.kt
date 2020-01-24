@@ -1,5 +1,6 @@
 package it.unibo.aggregatecomputingclient
 
+import communication.Message
 import it.unibo.aggregatecomputingclient.devices.Server
 
 interface ClientCommunication {
@@ -13,4 +14,6 @@ interface ClientCommunication {
      * Tell the Server this Device wants to join the net
      */
     fun subscribeToServer(server: Server)
+
+    fun clientCallback(message: Message)
 }
