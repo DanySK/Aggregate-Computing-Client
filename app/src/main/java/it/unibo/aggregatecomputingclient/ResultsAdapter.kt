@@ -14,7 +14,7 @@ class ResultsAdapter(private val mValues: List<String>) : RecyclerView.Adapter<R
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = mValues[position]
+        holder.textView.text = mValues[mValues.size - 1 - position]
     }
 
     override fun getItemCount(): Int = mValues.size

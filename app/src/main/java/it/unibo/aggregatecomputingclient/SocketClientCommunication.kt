@@ -1,31 +1,36 @@
 package it.unibo.aggregatecomputingclient
 
-import android.app.Activity
 import communication.Message
 import communication.MessageType
-import it.unibo.aggregatecomputingclient.devices.Client
-import it.unibo.aggregatecomputingclient.devices.Server
+import devices.client.Server
+import devices.server.RemoteDevice
+import java.net.SocketAddress
 import kotlin.concurrent.thread
 
-class SocketClientCommunication(private val client: Client) : ClientCommunication {
+/**
+ * onID: What to do when the Server tells this Client its ID
+ * onMessage: What to do when this Client receives a message
+ */
+class SocketClientCommunication(address: SocketAddress,
+                                private val onID: (Int) -> Unit,
+                                private val onMessage: (Message) -> Unit) : ClientCommunication {
 
-    override fun subscribeToServer(server: Server) {
+    private val listener = RemoteDevice(-1, address)
+
+    override fun subscribeToServer(server: RemoteDevice) {
         thread {
-            server.tell(Message(client.id, MessageType.Join, Execution.listenPort))
+            server.tell(Message(-1, MessageType.Join, Execution.listenPort))
             println("sent join message to ${server.address}")
         }
     }
 
-    override fun clientCallback(message: Message) {
+    override fun listen() = listener.physicalDevice.startServer {
+        val message = listener.physicalDevice.extractMessage(it)
         when (message.type) {
-            MessageType.ID -> client.assignId(message.content as Int)
-            MessageType.Execute -> client.execute()
-            //MessageType.Status -> client.status.add(it)
-            MessageType.Result -> (client.context as Activity).runOnUiThread { client.showResult(message.content.toString()) }
-            else -> { println(message) }
+            MessageType.ID -> onID(message.content as Int)
+            else -> onMessage(message)
         }
     }
 
-    override fun listen() = client.physicalDevice.startServer { clientCallback(client.physicalDevice.extractMessage(it)) }
-    override fun stop() = client.physicalDevice.stopServer()
+    override fun stop() = listener.physicalDevice.stopServer()
 }
