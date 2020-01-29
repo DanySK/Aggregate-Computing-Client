@@ -1,7 +1,6 @@
 package it.unibo.aggregatecomputingclient
 
-import devices.client.Server
-import devices.server.RemoteDevice
+import devices.implementations.RemoteDevice
 
 interface ClientCommunication {
     /**

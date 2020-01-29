@@ -8,10 +8,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import devices.server.RemoteDevice
-import devices.server.VirtualDevice
+import devices.implementations.RemoteDevice
+import devices.implementations.VirtualDevice
 import kotlinx.android.synthetic.main.activity_main.*
 import server.Support
+import utils.FromKotlin.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import kotlin.concurrent.thread
@@ -51,27 +52,32 @@ class MainActivity : AppCompatActivity() {
         )
         thread {
             server = RemoteDevice(Support.id, serverAddress, Support.name)
-        }
 
-        val program = object : AbstractAggregateProgram() {
-            override fun main(): Any = mid()
-        }
-
-        if (listener == null) {
-            val address = InetSocketAddress(getLocalIpAddress(), Execution.listenPort)
-
-            listener = SocketClientCommunication(
-                address,
-                onID = { id ->
-                    client = VirtualDevice(id, "Me", { ScafiAdapter(it, program, server) }, { result ->
-                        resultStrings.add(result)
-                        runOnUiThread { resultView.adapter!!.notifyDataSetChanged() }
-                    })
-                },
-                onMessage = { client.tell(it) }
-            )
-            listener!!.listen()
-            listener!!.subscribeToServer(server)
+            if (listener == null) {
+                listener = SocketClientCommunication(
+                    InetSocketAddress(getLocalIpAddress(), Execution.listenPort),
+                    onID = { id ->
+                        client = VirtualDevice(id, "Me", { ScafiAdapter(it, Program(), server) }, { result ->
+                            resultStrings.add(result)
+                            runOnUiThread { resultView.adapter!!.notifyDataSetChanged() }
+                        })
+                    },
+                    onMessage = { client.tell(it) }
+                )
+                listener!!.listen()
+                listener!!.subscribeToServer(server)
+            }
         }
     }
+}
+
+class Program : AbstractAggregateProgram() {
+    //override fun main(): Any = this.mid()
+
+    private fun isMe(): Boolean = nbr(def0 { mid() }) == mid()
+    override fun main(): Any = foldhood(
+        def0 { listOf<Int>() },
+        def2 { l1, l2 -> l1 + l2 },
+        def0 { mux(isMe(), listOf<Int>(), listOf(nbr(def0 { mid() as Int }))) }
+    )
 }

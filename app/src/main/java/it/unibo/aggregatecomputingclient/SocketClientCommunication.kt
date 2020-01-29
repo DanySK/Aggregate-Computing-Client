@@ -2,7 +2,7 @@ package it.unibo.aggregatecomputingclient
 
 import communication.Message
 import communication.MessageType
-import devices.server.RemoteDevice
+import devices.implementations.RemoteDevice
 import java.net.SocketAddress
 import kotlin.concurrent.thread
 
