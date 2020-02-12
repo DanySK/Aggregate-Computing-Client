@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun goLightWeight(view: View) {
-        thread { server.tell(Message(client.id, MessageType.GoLightWeight)) }
+        thread { server.tell(Message(client.id, MessageType.GoLightWeight, true)) }
 
         runOnUiThread {
             btnGoLightweight.isEnabled = false
