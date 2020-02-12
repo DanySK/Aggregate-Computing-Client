@@ -19,7 +19,7 @@ class SocketClientCommunication(localAddress: SocketAddress,
 
     override fun subscribeToServer(server: RemoteDevice) {
         thread {
-            server.tell(Message(-1, MessageType.Join, Execution.listenPort))
+            server.tell(Message(-1, MessageType.Join, port))
             println("sent join message to ${server.address}")
         }
     }

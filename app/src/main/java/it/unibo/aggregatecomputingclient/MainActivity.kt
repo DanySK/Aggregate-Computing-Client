@@ -11,11 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import devices.implementations.RemoteDevice
 import devices.implementations.VirtualDevice
 import kotlinx.android.synthetic.main.activity_main.*
+import server.Execution
 import server.Support
 import utils.FromKotlin.*
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import kotlin.concurrent.thread
+
+const val port = 20000
 
 class MainActivity : AppCompatActivity() {
     //A Client works exactly as a VirtualDevice
@@ -53,12 +56,14 @@ class MainActivity : AppCompatActivity() {
         thread {
             server = RemoteDevice(Support.id, serverAddress, Support.name)
 
+            Execution.adapter = { ScafiAdapter(it, Program(), server) }
+
             if (listener == null) {
                 listener = SocketClientCommunication(
-                    InetSocketAddress(getLocalIpAddress(), Execution.listenPort),
+                    InetSocketAddress(getLocalIpAddress(), port),
                     onID = { id ->
-                        client = VirtualDevice(id, "Me", { ScafiAdapter(it, Program(), server) }, { result ->
-                            resultStrings.add(result)
+                        client = VirtualDevice(id, "Me", Execution.adapter, { result ->
+                            resultStrings.add(result.toString())
                             runOnUiThread { resultView.adapter!!.notifyDataSetChanged() }
                         })
                     },
