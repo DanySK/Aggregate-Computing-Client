@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import communication.Message
+import communication.MessageType
 import devices.implementations.RemoteDevice
 import devices.implementations.VirtualDevice
 import kotlinx.android.synthetic.main.activity_main.*
@@ -66,12 +68,34 @@ class MainActivity : AppCompatActivity() {
                             resultStrings.add(result.toString())
                             runOnUiThread { resultView.adapter!!.notifyDataSetChanged() }
                         })
+
+                        runOnUiThread { btnGoLightweight.isEnabled = true }
                     },
                     onMessage = { client.tell(it) }
                 )
                 listener!!.listen()
                 listener!!.subscribeToServer(server)
             }
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun goLightWeight(view: View) {
+        thread { server.tell(Message(client.id, MessageType.GoLightWeight)) }
+
+        runOnUiThread {
+            btnGoLightweight.isEnabled = false
+            btnLeaveLightweight.isEnabled = true
+        }
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun leaveLightWeight(view: View) {
+        thread { server.tell(Message(client.id, MessageType.LeaveLightWeight)) }
+
+        runOnUiThread {
+            btnGoLightweight.isEnabled = true
+            btnLeaveLightweight.isEnabled = false
         }
     }
 }
