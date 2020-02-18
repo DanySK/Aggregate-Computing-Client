@@ -42,4 +42,9 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
 
     implementation 'it.unibo.apice.scafiteam:scafi-core_2.11:0.3.2'
+    implementation('org.protelis:protelis:13.0.3'){ dep ->
+        ['log4j', 'com.google.inject'].each{ group -> dep.exclude group: group }
+    }
+    implementation('org.slf4j:log4j-over-slf4j:1.7.30')
+    implementation 'com.google.inject:guice:4.0-beta:no_aop'
 }

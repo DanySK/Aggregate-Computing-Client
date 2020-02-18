@@ -13,12 +13,18 @@ import communication.MessageType
 import devices.implementations.RemoteDevice
 import devices.implementations.VirtualDevice
 import kotlinx.android.synthetic.main.activity_main.*
+import org.protelis.lang.ProtelisLoader
 import server.Execution
 import server.Support
-import utils.FromKotlin.*
+import utils.FromKotlin.def0
+import utils.FromKotlin.def2
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import kotlin.concurrent.thread
+
 
 const val port = 20000
 
@@ -48,6 +54,16 @@ class MainActivity : AppCompatActivity() {
             String.format(
                 "%d.%d.%d.%d", ip and 0xff, ip shr 8 and 0xff, ip shr 16 and 0xff, ip shr 24 and 0xff
             ))
+    }
+
+    /**
+     * Read a text file from resources
+     * Useful to be used with Protelis adapters
+     */
+    private fun readFromRaw(fileID: Int) : String {
+        val inputStream: InputStream = resources.openRawResource(fileID)
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
+        return bufferedReader.readText()
     }
 
     @Suppress("UNUSED_PARAMETER")
