@@ -1,5 +1,8 @@
 package it.unibo.aggregatecomputingclient
 
+import adapters.protelis.ProtelisAdapter
+import adapters.protelis.ProtelisContext
+import adapters.protelis.ProtelisNetworkManager
 import adapters.scafi.AbstractAggregateProgram
 import adapters.scafi.ScafiAdapter
 import android.content.Context
@@ -12,8 +15,10 @@ import communication.Message
 import communication.MessageType
 import devices.implementations.RemoteDevice
 import devices.implementations.VirtualDevice
+import devices.interfaces.Device
 import kotlinx.android.synthetic.main.activity_main.*
 import org.protelis.lang.ProtelisLoader
+import org.protelis.vm.NetworkManager
 import server.Execution
 import server.Support
 import utils.FromKotlin.def0
@@ -74,7 +79,8 @@ class MainActivity : AppCompatActivity() {
         thread {
             server = RemoteDevice(Support.id, serverAddress, Support.name)
 
-            Execution.adapter = { ScafiAdapter(it, Program(), server) }
+            //Execution.adapter = { ScafiAdapter(it, Program(), server) }
+            Execution.adapter = { ProtelisAdapter(it, readFromRaw(R.raw.hello), ::HelloContext, server) }
 
             if (listener == null) {
                 listener = SocketClientCommunication(
@@ -116,7 +122,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class Program : AbstractAggregateProgram() {
+/*class Program : AbstractAggregateProgram() {
     //override fun main(): Any = this.mid()
 
     private fun isMe(): Boolean = nbr(def0 { mid() }) == mid()
@@ -125,4 +131,12 @@ class Program : AbstractAggregateProgram() {
         def2 { l1, l2 -> l1 + l2 },
         def0 { mux(isMe(), listOf<Int>(), listOf(nbr(def0 { mid() as Int }))) }
     )
+}*/
+
+class HelloContext(private val device: Device, networkManager: NetworkManager) : ProtelisContext(device, networkManager) {
+    override fun instance(): ProtelisContext =
+        HelloContext(device, networkManager)
+
+    fun announce(something: String) = device.showResult("$device - $something")
+    fun getName() = device.toString()
 }
