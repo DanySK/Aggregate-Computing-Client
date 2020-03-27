@@ -3,3 +3,6 @@ android:
   components:
     - build-tools-26.0.2
     - android-29
+
+before_install:
+    - yes | sdkmanager "platforms;android-29"
