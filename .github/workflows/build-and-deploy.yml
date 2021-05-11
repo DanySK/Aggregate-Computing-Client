@@ -119,13 +119,15 @@ jobs:
           path: ok
   CI-Complete:
     needs: Build-Success
-    if: always() && ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
         with:
           name: success
       - shell: bash
+        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
         run: '[ -f ok ]'
   Automerge:
     needs: CI-Complete
