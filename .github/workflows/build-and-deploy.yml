@@ -7,6 +7,8 @@ on:
 
 jobs:
   Build:
+    # Disables the job if the event is from an *internal* pull request (there would be a push workflow in case) 
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
     strategy:
       matrix:
         os: [windows, macos, ubuntu]
@@ -117,7 +119,7 @@ jobs:
           path: ok
   CI-Complete:
     needs: Build-Success
-    if: always()
+    if: always() && ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
@@ -128,7 +130,7 @@ jobs:
   Automerge:
     needs: CI-Complete
     runs-on: ubuntu-latest
-    if: always()
+    if: success()
     steps:
       - name: automerge
         uses: "DanySK/yaagha@master"
