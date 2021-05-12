@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches-ignore:
-      - 'autodelivery-*'
+      - 'autodelivery*'
       - 'bump-*'
   pull_request:
   schedule:
