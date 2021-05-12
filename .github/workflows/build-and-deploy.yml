@@ -1,14 +1,15 @@
 name: CI
 on:
   push:
+    branches-ignore:
+      - 'autodelivery-*'
+      - 'bump-*'
   pull_request:
   schedule:
     - cron: '0 3 * * SUN'
 
 jobs:
   Build:
-    # Disables the job if the event is from an *internal* pull request (there would be a push workflow in case) 
-    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
     strategy:
       matrix:
         os: [windows, macos, ubuntu]
@@ -123,11 +124,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
-        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
         with:
           name: success
       - shell: bash
-        if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository }}
         run: '[ -f ok ]'
   Automerge:
     needs: CI-Complete
